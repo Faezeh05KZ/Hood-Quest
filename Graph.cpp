@@ -6,10 +6,8 @@ const std::vector<Neighbor> Graph::EMPTY_NEIGHBORS = {};
 
 Graph::Graph(){}
 
-bool Graph::addVertex(const Vertex& vertex)
-{
-    if (hasVertex(vertex.getId()))
-    {
+bool Graph::addVertex(const Vertex& vertex){
+    if (hasVertex(vertex.getId())){
         return false;
     }
 
@@ -20,19 +18,15 @@ bool Graph::addVertex(const Vertex& vertex)
     return true;
 }
 
-bool Graph::addEdge(const Edge& edge)
-{
+bool Graph::addEdge(const Edge& edge){
     if(edge.getSource()==edge.getDestination())
-    return false;
+        return false;
 
-    if (!hasVertex(edge.getSource()) ||
-        !hasVertex(edge.getDestination()))
-    {
+    if (!hasVertex(edge.getSource()) || !hasVertex(edge.getDestination())){
         return false;
     }
 
-    if (hasEdge(edge.getSource(), edge.getDestination()))
-    {
+    if (hasEdge(edge.getSource(), edge.getDestination())){
         return false;
     }
 
@@ -52,123 +46,80 @@ bool Graph::addEdge(const Edge& edge)
     return true;
 }
 
-bool Graph::removeVertex(const std::string& vertexName)
-{
-    if (!hasVertex(vertexName))
-    {
+bool Graph::removeVertex(const std::string& vertexName){
+    if (!hasVertex(vertexName)){
         return false;
     }
 
-    for (auto it = vertices.begin(); it != vertices.end(); ++it)
-    {
-        if (it->getId() == vertexName)
-        {
+    for (auto it = vertices.begin(); it != vertices.end(); ++it){
+        if (it->getId() == vertexName){
             vertices.erase(it);
             break;
         }
     }
 
     edges.erase(
-        std::remove_if(
-            edges.begin(),
-            edges.end(),
-            [&](const Edge& edge)
-            {
-                return edge.getSource() == vertexName ||
-                       edge.getDestination() == vertexName;
+        std::remove_if(edges.begin(), edges.end(), [&](const Edge& edge){
+                return edge.getSource() == vertexName || edge.getDestination() == vertexName;
             }),
         edges.end());
 
     adjacencyList.erase(vertexName);
 
-    for (auto& entry : adjacencyList)
-    {
+    for (auto& entry : adjacencyList){
         auto& neighbors = entry.second;
 
         neighbors.erase(
-            std::remove_if(
-                neighbors.begin(),
-                neighbors.end(),
-                [&](const Neighbor& neighbor)
-                {
-                    return neighbor.vertexName == vertexName;
-                }),
+            std::remove_if( neighbors.begin(), neighbors.end(), [&](const Neighbor& neighbor) {
+                    return neighbor.vertexName == vertexName;}),
             neighbors.end());
     }
 
     return true;
 }
 
-bool Graph::removeEdge(const std::string& source,
-                       const std::string& destination)
-{
-    if (!hasEdge(source, destination))
-    {
+bool Graph::removeEdge(const std::string& source, const std::string& destination){
+    if (!hasEdge(source, destination)){
         return false;
     }
 
     edges.erase(
-        std::remove_if(
-            edges.begin(),
-            edges.end(),
-            [&](const Edge& edge)
-            {
-                return
-                (
-                    edge.getSource() == source &&
-                    edge.getDestination() == destination
-                )
-                ||
-                (
-                    edge.getSource() == destination &&
-                    edge.getDestination() == source
-                );
+        std::remove_if( edges.begin(), edges.end(), [&](const Edge& edge) {
+                return( edge.getSource() == source && edge.getDestination() == destination) || 
+                ( edge.getSource() == destination && edge.getDestination() == source );
             }),
         edges.end());
 
     auto sourceIt = adjacencyList.find(source);
 
-if (sourceIt != adjacencyList.end())
-{
-    auto& sourceNeighbors = sourceIt->second;
+    if (sourceIt != adjacencyList.end()){
+        auto& sourceNeighbors = sourceIt->second;
 
-    sourceNeighbors.erase(
-        std::remove_if(
-            sourceNeighbors.begin(),
-            sourceNeighbors.end(),
-            [&](const Neighbor& neighbor)
-            {
-                return neighbor.vertexName == destination;
-            }),
-        sourceNeighbors.end());
-}
+        sourceNeighbors.erase(
+            std::remove_if( sourceNeighbors.begin(), sourceNeighbors.end(), [&](const Neighbor& neighbor) {
+                    return neighbor.vertexName == destination;
+                }),
+            sourceNeighbors.end());
+    }
 
-auto destinationIt = adjacencyList.find(destination);
+    auto destinationIt = adjacencyList.find(destination);
 
-if (destinationIt != adjacencyList.end())
-{
-    auto& destinationNeighbors = destinationIt->second;
+    if (destinationIt != adjacencyList.end()){
+        auto& destinationNeighbors = destinationIt->second;
 
-    destinationNeighbors.erase(
-        std::remove_if(
-            destinationNeighbors.begin(),
-            destinationNeighbors.end(),
-            [&](const Neighbor& neighbor)
-            {
-                return neighbor.vertexName == source;
-            }),
-        destinationNeighbors.end());
-}
+        destinationNeighbors.erase(
+            std::remove_if( destinationNeighbors.begin(), destinationNeighbors.end(), [&](const Neighbor& neighbor) {
+                    return neighbor.vertexName == source;
+                }),
+            destinationNeighbors.end());
+    }
 
     return true;
 }
 
-Vertex* Graph::findVertex(const std::string& vertexName)
-{
-    for (Vertex& vertex : vertices)
-    {
-        if (vertex.getId() == vertexName)
-        {
+Vertex* Graph::findVertex(const std::string& vertexName){
+    for (Vertex& vertex : vertices){
+        if (vertex.getId() == vertexName){
             return &vertex;
         }
     }
@@ -176,12 +127,9 @@ Vertex* Graph::findVertex(const std::string& vertexName)
     return nullptr;
 }
 
-bool Graph::hasVertex(const std::string& vertexName) const
-{
-    for (const Vertex& vertex : vertices)
-    {
-        if (vertex.getId() == vertexName)
-        {
+bool Graph::hasVertex(const std::string& vertexName) const{
+    for (const Vertex& vertex : vertices){
+        if (vertex.getId() == vertexName){
             return true;
         }
     }
@@ -189,20 +137,15 @@ bool Graph::hasVertex(const std::string& vertexName) const
     return false;
 }
 
-bool Graph::hasEdge(const std::string& source,
-                    const std::string& destination) const
-{
+bool Graph::hasEdge(const std::string& source, const std::string& destination) const{
     auto it = adjacencyList.find(source);
 
-    if (it == adjacencyList.end())
-    {
+    if (it == adjacencyList.end()){
         return false;
     }
 
-    for (const Neighbor& neighbor : it->second)
-    {
-        if (neighbor.vertexName == destination)
-        {
+    for (const Neighbor& neighbor : it->second){
+        if (neighbor.vertexName == destination){
             return true;
         }
     }
@@ -210,23 +153,18 @@ bool Graph::hasEdge(const std::string& source,
     return false;
 }
 
-const std::vector<Vertex>& Graph::getVertices() const
-{
+const std::vector<Vertex>& Graph::getVertices() const{
     return vertices;
 }
 
-const std::vector<Edge>& Graph::getEdges() const
-{
+const std::vector<Edge>& Graph::getEdges() const{
     return edges;
 }
 
-const std::vector<Neighbor>&
-Graph::getNeighbors(const std::string& vertexName) const
-{
+const std::vector<Neighbor>& Graph::getNeighbors(const std::string& vertexName) const{
     auto it = adjacencyList.find(vertexName);
 
-    if (it == adjacencyList.end())
-    {
+    if (it == adjacencyList.end()){
         return EMPTY_NEIGHBORS;
     }
 

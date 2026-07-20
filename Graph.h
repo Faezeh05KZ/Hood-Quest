@@ -8,23 +8,18 @@
 #include "Vertex.h"
 #include "Edge.h"
 
-struct Neighbor
-{
+struct Neighbor{
     std::string vertexName;
     int weight;
 };
 
-class Graph
-{
+class Graph{
 private:
 
     std::vector<Vertex> vertices;
     std::vector<Edge> edges;
 
-    std::unordered_map<
-        std::string,
-        std::vector<Neighbor>
-    > adjacencyList;
+    std::unordered_map< std::string, std::vector<Neighbor>> adjacencyList;
 
     static const std::vector<Neighbor> EMPTY_NEIGHBORS;
 
