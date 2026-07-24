@@ -16,7 +16,7 @@ GameState &GameState::operator=(const GameState &other)
     {
         player = other.player;
         wolf = other.wolf;
-        graph = other.graph;
+        graph = other.graph; 
         score = other.score;
         turnNumber = other.turnNumber;
         status = other.status;
@@ -26,11 +26,9 @@ GameState &GameState::operator=(const GameState &other)
 
 Player &GameState::getPlayer() { return player; }
 const Player &GameState::getPlayer() const { return player; }
-void GameState::setPlayer(const Player &p) { player = p; }
 
 Wolf &GameState::getWolf() { return wolf; }
 const Wolf &GameState::getWolf() const { return wolf; }
-void GameState::setWolf(const Wolf &w) { wolf = w; }
 
 const Graph *GameState::getGraph() const { return graph; }
 void GameState::setGraph(const Graph *g) { graph = g; }
@@ -46,10 +44,14 @@ GameStatus GameState::getStatus() const { return status; }
 void GameState::setStatus(GameStatus s) { status = s; }
 bool GameState::isGameOver() const { return status != GameStatus::Playing; }
 
+bool GameState::areColliding() const {
+    return player.getPosition() == wolf.getPosition();
+}
+
 void GameState::reset()
 {
-    player.reset();
-    wolf.reset();
+    player.reset(); 
+    wolf.reset();  
     score = 0;
     turnNumber = 1;
     status = GameStatus::Playing;

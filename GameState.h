@@ -3,7 +3,7 @@
 
 #include "Player.h"
 #include "Wolf.h"
-#include "Graph.h"
+#include "Graph.h" 
 
 enum class GameStatus { Playing, Won, Lost };
 
@@ -11,33 +11,31 @@ class GameState {
 private:
     Player player;
     Wolf wolf;
-    const Graph* graph; 
+    const Graph* graph;
     int score;
     int turnNumber;
     GameStatus status;
 
 public:
     GameState();
-    GameState(const Player& p, const Wolf& w, const Graph* g, int initialScore = 0);
+    GameState(const Graph* g); 
+    GameState(const GameState &other);
 
-    GameState(const GameState& other);
-
-    GameState& operator=(const GameState& other);
+    GameState &operator=(const GameState &other);
 
     void reset();
     void nextTurn();
     bool isGameOver() const;
+    bool areColliding() const; 
 
     Player& getPlayer();
     const Player& getPlayer() const;
-    void setPlayer(const Player& p);
 
     Wolf& getWolf();
     const Wolf& getWolf() const;
-    void setWolf(const Wolf& w);
 
-    const Graph* getGraph() const;
-    void setGraph(const Graph* g);
+    const Graph* getGraph() const; 
+    void setGraph(const Graph* g); 
 
     int getScore() const;
     void setScore(int s);
