@@ -5,6 +5,7 @@
 #include "Wolf.h"
 #include "Graph.h" 
 
+
 enum class GameStatus { Playing, Won, Lost };
 
 class GameState {
