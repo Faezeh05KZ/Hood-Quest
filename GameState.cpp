@@ -48,10 +48,10 @@ bool GameState::areColliding() const {
     return player.getPosition() == wolf.getPosition();
 }
 
-void GameState::reset()
+void GameState::reset(const std::string& playerStart, const std::string& wolfStart)
 {
-    player.reset(); 
-    wolf.reset();  
+    player.reset(playerStart); 
+    wolf.reset(wolfStart);  
     score = 0;
     turnNumber = 1;
     status = GameStatus::Playing;

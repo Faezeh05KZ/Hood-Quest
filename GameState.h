@@ -1,10 +1,10 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
+#include <string>
 #include "Player.h"
 #include "Wolf.h"
 #include "Graph.h" 
-
 
 enum class GameStatus { Playing, Won, Lost };
 
@@ -24,7 +24,7 @@ public:
 
     GameState &operator=(const GameState &other);
 
-    void reset();
+    void reset(const std::string& playerStart = "", const std::string& wolfStart = "");
     void nextTurn();
     bool isGameOver() const;
     bool areColliding() const; 
