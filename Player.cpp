@@ -1,17 +1,17 @@
 #include "Player.h"
 
-Player::Player() : position(0) {}
+Player::Player() : position("") {}
 
-Player::Player(int startPos) : position(startPos) {}
+Player::Player(const std::string& startPos) : position(startPos) {}
 
-int Player::getPosition() const {
+std::string Player::getPosition() const {
     return position;
 }
 
-void Player::setPosition(int pos) {
+void Player::setPosition(const std::string& pos) {
     position = pos;
 }
 
-void Player::reset(int startPos) {
+void Player::reset(const std::string& startPos) {
     position = startPos;
 }

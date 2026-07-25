@@ -1,17 +1,17 @@
 #include "Wolf.h"
 
-Wolf::Wolf() : position(0) {}
+Wolf::Wolf() : position("") {}
 
-Wolf::Wolf(int startPos) : position(startPos) {}
+Wolf::Wolf(const std::string& startPos) : position(startPos) {}
 
-int Wolf::getPosition() const {
+std::string Wolf::getPosition() const {
     return position;
 }
 
-void Wolf::setPosition(int pos) {
+void Wolf::setPosition(const std::string& pos) {
     position = pos;
 }
 
-void Wolf::reset(int startPos) {
+void Wolf::reset(const std::string& startPos) {
     position = startPos;
 }

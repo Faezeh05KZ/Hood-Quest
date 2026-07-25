@@ -1,18 +1,20 @@
 #ifndef WOLF_H
 #define WOLF_H
 
+#include <string>
+
 class Wolf {
 private:
-    int position;
+    std::string position;
 
 public:
     Wolf();
-    explicit Wolf(int startPos);
+    explicit Wolf(const std::string& startPos);
 
-    int getPosition() const;
-    void setPosition(int pos);
+    std::string getPosition() const;
+    void setPosition(const std::string& pos);
 
-    void reset(int startPos = 0);
+    void reset(const std::string& startPos = "");
 };
 
-#endif 
+#endif
