@@ -6,10 +6,12 @@
 class ScoreManager
 {
 public:
-    static const int SFollowDijkstra = 3;
-    static const int SValidMove = 1;    
-    static const int SUndo = -2;      
-    static const int SWin = 5;            
+    ScoreManager() = delete;
+
+    static const int SFollowDijkstra = 3; 
+    static const int SValidMove = 1;
+    static const int SUndo = -2;
+    static const int SWin = 5;
 
     static void awardFollowDijkstra(GameState &state);
     static void awardValidMove(GameState &state);
@@ -19,4 +21,4 @@ public:
     static void awardMoveScore(GameState &state, bool followedSuggestion);
 };
 
-#endif 
+#endif
