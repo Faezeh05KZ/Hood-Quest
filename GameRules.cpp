@@ -3,8 +3,7 @@
 bool GameRules::checkWin(const GameState &state)
 {
     const std::string GoTherTOWin = "V";
-
-    return (state.getPlayerPosition() == GoTherTOWin) && !checkLose(state);
+    return (state.getPlayer().getPosition() == GoTherTOWin) && !checkLose(state);
 }
 
 bool GameRules::checkLose(const GameState &state)
@@ -29,6 +28,6 @@ bool GameRules::isValidMove(const GameState &state, const std::string &targetVer
     {
         return false;
     }
-    std::string currentPos = state.getPlayerPosition();
+    const std::string &currentPos = state.getPlayer().getPosition();
     return graph->hasEdge(currentPos, targetVertex);
 }
