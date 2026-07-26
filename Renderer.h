@@ -4,14 +4,25 @@
 #include <string>
 #include <vector>
 #include "GameState.h"
-#include "Graph.h"
 
 class Renderer
 {
 public:
+    static void clearScreen();
+
     static void renderWelcome();
 
+    static void renderSeparator();
+
     static void renderMainMenu();
+
+    static void renderRegistrationPrompt();
+
+    static void renderLoginPrompt();
+
+    static void renderUserInfo(const std::string &username, int totalScore);
+
+    static void renderTopPlayer(const std::string &topName, int topScore);
 
     static void renderGameHeader(const GameState &state, const std::string &username);
 
@@ -23,23 +34,13 @@ public:
 
     static void renderWolfMove(const std::string &wolfFrom, const std::string &wolfTo, bool moved, int diceRoll);
 
+    static void renderScoreDelta(int delta, const std::string &reason);
+
     static void renderGameOver(const GameState &state, const std::string &username);
-
-    static void renderUserInfo(const std::string &username, int totalScore);
-
-    static void renderTopPlayer(const std::string &topName, int topScore);
 
     static void renderError(const std::string &msg);
 
     static void renderMessage(const std::string &msg);
-
-    static void renderRegistrationPrompt();
-
-    static void renderLoginPrompt();
-
-    static void renderSeparator();
-
-    static void renderScoreDelta(int delta, const std::string &reason);
 };
 
 #endif
