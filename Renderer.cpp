@@ -1,9 +1,32 @@
 #include "Renderer.h"
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
+
+namespace Color
+{
+    const std::string RESET = "\033[0m";
+    const std::string RED = "\033[31m";
+    const std::string YELLOW = "\033[33m";
+    const std::string GREEN = "\033[32m";
+    const std::string MAGENTA = "\033[35m";
+    const std::string CYAN = "\033[36m";
+    const std::string BOLD = "\033[1m";
+}
+
+void Renderer::clearScreen()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
 
 void Renderer::renderWelcome()
 {
+    clearScreen();
+    std::cout << Color::CYAN << Color::BOLD;
     std::cout << "\n";
     std::cout << "  ██╗  ██╗ ██████╗  ██████╗ ██████╗  ██████╗ ██╗   ██╗███████╗███████╗████████╗\n";
     std::cout << "  ██║  ██║██╔═══██╗██╔═══██╗██╔══██╗██╔═══██╗██║   ██║██╔════╝██╔════╝╚══██╔══╝\n";
@@ -11,63 +34,28 @@ void Renderer::renderWelcome()
     std::cout << "  ██╔══██║██║   ██║██║   ██║██║  ██║██║▄▄ ██║██║   ██║██╔══╝  ╚════██║   ██║   \n";
     std::cout << "  ██║  ██║╚██████╔╝╚██████╔╝██████╔╝╚██████╔╝╚██████╔╝███████╗███████║   ██║   \n";
     std::cout << "  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═════╝  ╚══▀▀═╝  ╚═════╝ ╚══════╝╚══════╝   ╚═╝   \n";
-    std::cout << "\n           The Algorithm Forest  --  Help Red Riding Hood reach Grandma!\n\n";
+    std::cout << Color::RESET << Color::BOLD;
+    std::cout << "\n           The Algorithm Forest  --  Help Red Riding Hood reach Grandma!\n\n"
+              << Color::RESET;
 }
 
 void Renderer::renderSeparator()
 {
-    std::cout << "  +---------------------------------------------------------+\n";
-}
-
-void Renderer::renderMainMenu()
-{
-    renderSeparator();
-    std::cout << "  |                     MAIN MENU                          |\n";
-    renderSeparator();
-    std::cout << "  |  1. Register new account                               |\n";
-    std::cout << "  |  2. Login to existing account                          |\n";
-    std::cout << "  |  3. Exit                                               |\n";
-    renderSeparator();
-    std::cout << "  Your choice: ";
-}
-
-void Renderer::renderRegistrationPrompt()
-{
-    std::cout << "\n  --- Register ---\n";
-    std::cout << "  Username: ";
-}
-
-void Renderer::renderLoginPrompt()
-{
-    std::cout << "\n  --- Login ---\n";
-    std::cout << "  Username: ";
-}
-
-void Renderer::renderUserInfo(const std::string &username, int totalScore)
-{
-    std::cout << "\n  Welcome back, " << username << "!\n";
-    std::cout << "  Your total score: " << totalScore << "\n";
-}
-
-void Renderer::renderTopPlayer(const std::string &topName, int topScore)
-{
-    std::cout << "\n  +------------------------------+\n";
-    std::cout << "  |  CURRENT TOP PLAYER          |\n";
-    std::cout << "  |  " << std::left << std::setw(20) << topName
-              << " " << std::right << std::setw(5) << topScore << "  |\n";
-    std::cout << "  +------------------------------+\n";
+    std::cout << Color::CYAN << "  +---------------------------------------------------------+\n"
+              << Color::RESET;
 }
 
 void Renderer::renderGameHeader(const GameState &state, const std::string &username)
 {
-    std::cout << "\n";
     renderSeparator();
-    std::cout << "  |  Player: " << std::left << std::setw(12) << username
-              << "  Score: " << std::setw(5) << state.getScore()
+    std::cout << "  |  Player: " << Color::BOLD << std::left << std::setw(12) << username << Color::RESET
+              << "  Score: " << Color::GREEN << std::setw(5) << state.getScore() << Color::RESET
               << "  Turn: " << std::setw(3) << state.getTurnNumber() << "   |\n";
-    std::cout << "  |  Red Riding Hood: [" << state.getPlayer().getPosition()
-              << "]    Wolf: [" << state.getWolf().getPosition()
-              << "]    Goal: [V]              |\n";
+
+    std::cout << "  |  Red Riding Hood: [" << Color::RED << state.getPlayer().getPosition() << Color::RESET
+              << "]    Wolf: [" << Color::YELLOW << state.getWolf().getPosition() << Color::RESET
+              << "]    Goal: [" << Color::GREEN << "V" << Color::RESET << "]              |\n";
+              
     renderSeparator();
 }
 
@@ -80,72 +68,40 @@ void Renderer::renderMap(const GameState &state)
     std::string player = state.getPlayer().getPosition();
     std::string wolf = state.getWolf().getPosition();
 
-    std::cout << "\n  Map nodes  ( [R]=Red Hood  [W]=Wolf  [G]=Grandma )\n";
-    std::cout << "  ";
+    std::cout << "\n  Map nodes ("
+              << Color::RED << " [R]" << Color::RESET << "=Red Hood "
+              << Color::YELLOW << " [W]" << Color::RESET << "=Wolf "
+              << Color::GREEN << " [G]" << Color::RESET << "=Grandma )\n  ";
+
     for (const auto &v : g->getVertices())
     {
         std::string id = v.getId();
         std::cout << id;
         if (id == player && id == wolf)
-            std::cout << "[R+W] ";
+            std::cout << Color::MAGENTA << "[R+W] " << Color::RESET;
         else if (id == player)
-            std::cout << "[R]   ";
+            std::cout << Color::RED << "[R]   " << Color::RESET;
         else if (id == wolf)
-            std::cout << "[W]   ";
+            std::cout << Color::YELLOW << "[W]   " << Color::RESET;
         else if (id == "V")
-            std::cout << "[G]   ";
+            std::cout << Color::GREEN << "[G]   " << Color::RESET;
         else
             std::cout << "      ";
     }
-    std::cout << "\n";
+    std::cout << "\n\n";
 
-    std::cout << "  Edges: ";
+    std::cout << "  Edges:\n   ";
+    int edgeCount = 0;
     for (const auto &edge : g->getEdges())
     {
-        std::cout << edge.getSource() << "-" << edge.getDestination() << "(" << edge.getWeight() << ") ";
+        std::cout << edge.getSource() << "-" << edge.getDestination() << "(" << edge.getWeight() << ")  ";
+        edgeCount++;
+        if (edgeCount % 5 == 0)
+        {
+            std::cout << "\n   ";
+        }
     }
     std::cout << "\n";
-}
-
-void Renderer::renderTurnInfo(const GameState &state, const std::vector<std::string> &suggestedPath, const std::string &suggestedNext, const std::vector<std::string> &validMoves)
-{
-    std::cout << "\n  Dijkstra suggested path to Grandma's house:\n  ";
-    for (size_t i = 0; i < suggestedPath.size(); ++i)
-    {
-        std::cout << suggestedPath[i] << (i + 1 < suggestedPath.size() ? " -> " : "");
-    }
-    std::cout << "\n  Suggested next move: [" << suggestedNext << "]\n";
-    std::cout << "  Your valid moves: ";
-    for (const auto &move : validMoves)
-        std::cout << "[" << move << "] ";
-    std::cout << "\n";
-}
-
-void Renderer::renderMoveOptions(const std::vector<std::string> &validMoves, const std::string &suggestedNext, bool canUndo)
-{
-    std::cout << "\n  Enter your choice:\n";
-    std::cout << "    - A vertex name for a valid move (";
-    for (const auto &move : validMoves)
-        std::cout << move << " ";
-    std::cout << ")\n";
-    std::cout << "    - 'D' to follow Dijkstra suggestion [" << suggestedNext << "]\n";
-    if (canUndo)
-        std::cout << "    - 'U' to Undo last turn (-2 score)\n";
-    std::cout << "  > ";
-}
-
-void Renderer::renderWolfMove(const std::string &wolfFrom, const std::string &wolfTo, bool moved, int diceRoll)
-{
-    std::cout << "\n  [Wolf] Dice rolled: " << diceRoll;
-    if (moved)
-        std::cout << " (even) -> Wolf moves from [" << wolfFrom << "] to [" << wolfTo << "]\n";
-    else
-        std::cout << " (odd) -> Wolf stays at [" << wolfFrom << "]\n";
-}
-
-void Renderer::renderScoreDelta(int delta, const std::string &reason)
-{
-    std::cout << "  Score " << (delta >= 0 ? "+" : "") << delta << "  (" << reason << ")\n";
 }
 
 void Renderer::renderGameOver(const GameState &state, const std::string &username)
@@ -154,13 +110,17 @@ void Renderer::renderGameOver(const GameState &state, const std::string &usernam
     renderSeparator();
     if (state.getStatus() == GameStatus::Won)
     {
+        std::cout << Color::GREEN << Color::BOLD;
         std::cout << "  |           *** YOU WIN! ***                           |\n";
-        std::cout << "  |  Red Riding Hood reached Grandma's house!            |\n";
+        std::cout << "  |  Red Riding Hood reached Grandma's house!            |\n"
+                  << Color::RESET;
     }
     else
     {
+        std::cout << Color::RED << Color::BOLD;
         std::cout << "  |           *** GAME OVER ***                          |\n";
-        std::cout << "  |  The wolf caught Red Riding Hood!                    |\n";
+        std::cout << "  |  The wolf caught Red Riding Hood!                    |\n"
+                  << Color::RESET;
     }
     std::cout << "  |  " << username << "'s score this round: " << state.getScore() << "\n";
     renderSeparator();
@@ -168,7 +128,7 @@ void Renderer::renderGameOver(const GameState &state, const std::string &usernam
 
 void Renderer::renderError(const std::string &msg)
 {
-    std::cout << "  [!] " << msg << "\n";
+    std::cout << Color::RED << "  [!] " << msg << Color::RESET << "\n";
 }
 
 void Renderer::renderMessage(const std::string &msg)
