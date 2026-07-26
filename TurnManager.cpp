@@ -51,8 +51,7 @@ bool TurnManager::executeTurn()
     return true;
 }
 
-bool TurnManager::playerPhase(const std::string &suggestedNext,
-                              const std::vector<std::string> &validMoves)
+bool TurnManager::playerPhase(const std::string &suggestedNext, const std::vector<std::string> &validMoves)
 {
     while (true)
     {
