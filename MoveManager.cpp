@@ -1,37 +1,19 @@
 #include "MoveManager.h"
-#include "GameState.h"
+#include "GameRules.h"
 #include "ScoreManager.h"
 #include <iostream>
 
-MoveManager::MoveManager(GameState& state, UndoManager& undo)
-    : gameState(state), undoManager(undo), bfs(*state.getGraph()){}
-
-void MoveManager::showSuggestedPath() const{
-    PathResult path = Dijkstra::findShortestPath( *gameState.getGraph(), gameState.getPlayer().getPosition(), "V");
-    if(path.path.empty()){
-        std::cout<<"No Path\n";
-        return;
-    }
-
-    std::cout << "Suggested Path : ";
-
-    for (const auto& vertex : path.path){
-        std::cout << vertex << " ";
-    }
-
-    std::cout << std::endl;
-}
+MoveManager::MoveManager(GameState& state, UndoManager& undoManager)
+    : gameState(state), undoManager(undoManager), bfs(*state.getGraph()){}
 
 bool MoveManager::movePlayer(const std::string& destination){
-    const Graph* graph = gameState.getGraph();
-
-    std::string current = gameState.getPlayer().getPosition();
-
-    if (!graph->hasEdge(current, destination)){
+    if (!GameRules::isValidMove(gameState, destination)){
         return false;
     }
 
     undoManager.saveState(gameState);
+    const Graph* graph = gameState.getGraph();
+    const std::string current = gameState.getPlayer().getPosition();
 
     PathResult shortestPath = Dijkstra::findShortestPath(*graph, current,"V");
 
@@ -42,72 +24,54 @@ bool MoveManager::movePlayer(const std::string& destination){
     }
 
     gameState.getPlayer().setPosition(destination);
-
     ScoreManager::awardMoveScore( gameState, followedSuggestion);
 
     return true;
 }
 
-//حرکت گرگ
+void MoveManager::moveWolf(){
+    std::string nextMove = bfs.getNextMove( gameState.getWolf().getPosition(), gameState.getPlayer().getPosition());
 
-bool MoveManager::useUndo(){
-    if (!undoManager.canUndo()){
-        return false;
+    if (!nextMove.empty()){
+        gameState.getWolf().setPosition(nextMove);
     }
-
-    gameState = undoManager.undo();
-    ScoreManager::applyUndoPenalty(gameState);
-
-    return true;
 }
 
-void MoveManager::playTurn(){
-    showSuggestedPath();
-    std::string destination;
-    std::cin >> destination;
+void MoveManager::showSuggestedPath() const{
+    PathResult result = Dijkstra::findShortestPath( *gameState.getGraph(), gameState.getPlayer().getPosition(), "V");
 
-    if (destination == "UNDO"){
-        useUndo();
+    if (result.path.empty()){
+        std::cout << "No Path\n";
         return;
     }
 
-    if (!movePlayer(destination)){
-        std::cout << "Invalid Move\n";
-        return;
+    std::cout << "Suggested Path : ";
+
+    for (const auto& vertex : result.path){
+        std::cout << vertex << " ";
     }
 
-    if (checkWin()){
-        return;
-    }
-
-    if (checkLose()){
-        return;
-    }
-
-    moveWolf();
-
-    if (checkLose()){
-        return;
-    }
-
-    gameState.nextTurn();
+    std::cout << std::endl;
 }
 
-bool MoveManager::checkWin(){
-    if (gameState.getPlayer().getPosition() == "V"){
-        gameState.setStatus(GameStatus::Won);
-        ScoreManager::awardWinBonus(gameState);
-        return true;
+std::vector<std::string> MoveManager::getValidMoves() const{
+    std::vector<std::string> validMoves;
+
+    const auto& neighbors = gameState.getGraph()->getNeighbors( gameState.getPlayer().getPosition());
+
+    for (const auto& neighbor : neighbors){
+        validMoves.push_back(neighbor.vertexName);
     }
 
-    return false;
+    return validMoves;
 }
 
-bool MoveManager::checkLose(){
-    if (gameState.areColliding()){
-        gameState.setStatus(GameStatus::Lost);
-        return true;
+std::string MoveManager::getSuggestedNextMove() const{
+    PathResult result = Dijkstra::findShortestPath(*gameState.getGraph(),gameState.getPlayer().getPosition(), "V");
+
+    if (result.path.size() < 2){
+        return "";
     }
 
-    return false;
+    return result.path[1];
 }

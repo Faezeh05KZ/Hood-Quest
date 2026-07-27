@@ -16,14 +16,13 @@ private:
 
 public:
 
-    MoveManager(GameState& state, UndoManager& undo);
-    void playTurn();
+    MoveManager(GameState& state, UndoManager& undoManager);
     bool movePlayer(const std::string& destination);
     void moveWolf();
-    bool useUndo();
     void showSuggestedPath() const;
-    bool checkWin();
-    bool checkLose();
+    std::vector<std::string> getValidMoves() const;
+    std::string getSuggestedNextMove() const;
+  
 };
 
 #endif
