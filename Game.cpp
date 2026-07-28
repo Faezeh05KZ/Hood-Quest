@@ -1,61 +1,73 @@
 #include "Game.h"
+
 #include "GameInitializer.h"
 #include "GameLoop.h"
 #include "TurnManager.h"
+#include "MoveManager.h"
+#include "UndoManager.h"
 #include "Renderer.h"
 #include "InputManager.h"
 #include "GraphBuilder.h"
-#include "MoveManager.h"
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 
-Game::Game() : auth(), leaderboard(auth)
-{
+Game::Game()
+    : userStorage(), auth(userStorage), scoreHeap(), leaderboard(scoreHeap), scoreTree(), graph() {
     srand(static_cast<unsigned int>(time(nullptr)));
+
     GraphBuilder builder;
     graph = builder.buildGraph();
+
+    userStorage.loadUsers();
+    loadExistingUsersIntoStructures();
 }
 
-void Game::start()
-{
+
+void Game::loadExistingUsersIntoStructures() {
+    for (User* user : userStorage.getAllUsers()) {
+        scoreHeap.insert(user);
+        scoreTree.insert(user);
+    }
+}
+
+void Game::run() {
+    start();
+    userStorage.saveUsers();
+}
+
+void Game::start() {
     Renderer::renderWelcome();
     mainMenuLoop();
 }
 
-void Game::run()
-{
-    start();
-}
-
-void Game::mainMenuLoop()
-{
-    while (true)
-    {
+void Game::mainMenuLoop() {
+    while (true) {
         Renderer::renderMainMenu();
         int choice = InputManager::readMenuChoice(1, 3);
-        switch (choice)
-        {
-        case 1:
-            handleRegister();
-            break;
-        case 2:
-            handleLogin();
-            break;
-        case 3:
-            Renderer::renderMessage("Goodbye! May Red Riding Hood's path always be safe.");
-            return;
+
+        switch (choice) {
+            case 1:
+                handleRegister();
+                break;
+            case 2:
+                handleLogin();
+                break;
+            case 3:
+                Renderer::renderMessage("Goodbye! May Red Riding Hood's path always be safe.");
+                return;
         }
     }
 }
 
-void Game::handleRegister()
-{
+void Game::handleRegister() {
     Renderer::renderRegistrationPrompt();
+
+    std::cout << "  Username: ";
     std::string username = InputManager::readString();
 
-    if (username.empty())
-    {
+    if (username.empty()) {
         Renderer::renderError("Username cannot be empty.");
         return;
     }
@@ -63,107 +75,120 @@ void Game::handleRegister()
     std::cout << "  Password: ";
     std::string password = InputManager::readString(false);
 
-    if (password.empty())
-    {
+    if (password.empty()) {
         Renderer::renderError("Password cannot be empty.");
         return;
     }
 
-    if (auth.registerUser(username, password))
-    {
-        Renderer::renderMessage("Account created! Welcome, " + username + "!");
-    }
-    else
-    {
+    if (!auth.registerUser(username, password)) {
         Renderer::renderError("Username '" + username + "' already exists. Try a different name.");
+        return;
     }
+
+
+    User* newUser = userStorage.findUser(username);
+    if (newUser != nullptr) {
+        scoreHeap.insert(newUser);
+        scoreTree.insert(newUser);
+    }
+
+    userStorage.saveUsers();
+    Renderer::renderMessage("Account created! Welcome, " + username + "!");
 }
 
-void Game::handleLogin()
-{
+void Game::handleLogin() {
     Renderer::renderLoginPrompt();
+
+    std::cout << "  Username: ";
     std::string username = InputManager::readString();
 
     std::cout << "  Password: ";
     std::string password = InputManager::readString(false);
 
-    UserRecord rec;
-    if (!auth.login(username, password, rec))
-    {
+    User* user = auth.login(username, password);
+
+    if (user == nullptr) {
         Renderer::renderError("Invalid username or password.");
         return;
     }
 
-    Renderer::renderUserInfo(rec.username, rec.totalScore);
-    HeapEntry top = auth.getTopPlayer();
-    Renderer::renderTopPlayer(top.username, top.score);
+    Renderer::renderUserInfo(user->getUsername(), user->getTotalScore());
 
-    while (true)
-    {
+    if (leaderboard.hasTopPlayer()) {
+        User* top = leaderboard.getTopPlayer();
+        Renderer::renderTopPlayer(top->getUsername(), top->getTotalScore());
+    }
+
+    while (true) {
         std::cout << "\n  What would you like to do?\n";
         std::cout << "  1. Play a new game\n";
         std::cout << "  2. Search score by username (BST)\n";
-        std::cout << "  3. View leaderboard\n";
+        std::cout << "  3. Show current top player\n";
         std::cout << "  4. Logout\n";
         std::cout << "  > ";
+
         int choice = InputManager::readMenuChoice(1, 4);
 
-        if (choice == 1)
-        {
+        if (choice == 1) {
             playGame(username);
-            HeapEntry newTop = auth.getTopPlayer();
-            Renderer::renderTopPlayer(newTop.username, newTop.score);
-        }
-        else if (choice == 2)
-        {
+
+            if (leaderboard.hasTopPlayer()) {
+                User* newTop = leaderboard.getTopPlayer();
+                Renderer::renderTopPlayer(newTop->getUsername(), newTop->getTotalScore());
+            }
+        } else if (choice == 2) {
             showBSTSearch();
-        }
-        else if (choice == 3)
-        {
-            leaderboard.displayTop(10);
-        }
-        else
-        {
+        } else if (choice == 3) {
+            leaderboard.showTopPlayer();
+        } else {
             Renderer::renderMessage("Logged out.");
             break;
         }
     }
 }
 
-void Game::playGame(const std::string &username)
-{
+void Game::playGame(const std::string& username) {
+    User* user = userStorage.findUser(username);
+    if (user == nullptr) {
+        Renderer::renderError("User not found.");
+        return;
+    }
+
     GameState state;
     GameInitializer::initializeGame(state, graph);
+
     UndoManager undoManager;
-    MoveManager moveManager(state, undoManager);
+    MoveManager moveManager(state);
+
     Renderer::renderMessage("\n  === NEW GAME STARTED ===");
     Renderer::renderMessage("  Red Hood starts at [" + state.getPlayer().getPosition() +
-                            "], Wolf at [" + state.getWolf().getPosition() +
-                            "], Goal: [V]");
+                             "], Wolf at [" + state.getWolf().getPosition() +
+                             "], Goal: [V]");
 
     TurnManager turnManager(state, moveManager, undoManager, username);
     GameLoop gameLoop(turnManager);
 
     gameLoop.run(state, username);
-    int roundScore = state.getScore();
-    auth.updateScore(username, roundScore);
 
-    UserRecord updated;
-    auth.getUserInfo(username, updated);
-    Renderer::renderMessage("  Total score updated to: " + std::to_string(updated.totalScore));
+    int roundScore = state.getScore();
+    user->addToTotalScore(roundScore);
+
+    leaderboard.refresh(user);
+    scoreTree.insert(user);
+    userStorage.saveUsers();
+
+    Renderer::renderMessage("  Total score updated to: " + std::to_string(user->getTotalScore()));
 }
 
-void Game::showBSTSearch()
-{
+void Game::showBSTSearch() {
     std::cout << "\n  Enter username to search: ";
     std::string name = InputManager::readString();
-    BSTEntry entry;
-    if (auth.searchBST(name, entry))
-    {
-        std::cout << "  Found: " << entry.username << " -> Score: " << entry.score << "\n";
-    }
-    else
-    {
+
+    User* found = scoreTree.search(name);
+
+    if (found != nullptr) {
+        std::cout << "  Found: " << found->getUsername() << " -> Score: " << found->getTotalScore() << "\n";
+    } else {
         Renderer::renderError("User '" + name + "' not found in BST.");
     }
 }
