@@ -1,31 +1,17 @@
 #include "MoveManager.h"
 #include "GameRules.h"
-#include "ScoreManager.h"
+#include "AStar.h"
 #include <iostream>
 
-MoveManager::MoveManager(GameState& state, UndoManager& undoManager)
-    : gameState(state), undoManager(undoManager), bfs(*state.getGraph()){}
+MoveManager::MoveManager(GameState& state)
+    : gameState(state), bfs(*state.getGraph()){}
 
 bool MoveManager::movePlayer(const std::string& destination){
     if (!GameRules::isValidMove(gameState, destination)){
         return false;
     }
 
-    undoManager.saveState(gameState);
-    const Graph* graph = gameState.getGraph();
-    const std::string current = gameState.getPlayer().getPosition();
-
-    PathResult shortestPath = Dijkstra::findShortestPath(*graph, current,"V");
-
-    bool followedSuggestion = false;
-
-    if (shortestPath.path.size() >= 2){
-        followedSuggestion = (shortestPath.path[1] == destination);
-    }
-
     gameState.getPlayer().setPosition(destination);
-    ScoreManager::awardMoveScore( gameState, followedSuggestion);
-
     return true;
 }
 
@@ -48,6 +34,27 @@ void MoveManager::showSuggestedPath() const{
     std::cout << "Suggested Path : ";
 
     for (const auto& vertex : result.path){
+        std::cout << vertex << " ";
+    }
+
+    std::cout << std::endl;
+}
+
+void MoveManager::showSuggestedAStarPath() const{
+    PathResult result =
+        AStar::findShortestPath(
+            *gameState.getGraph(),
+            gameState.getPlayer().getPosition(),
+            "V");
+
+    if(result.path.empty()){
+        std::cout << "No Path\n";
+        return;
+    }
+
+    std::cout << "A* Suggested Path : ";
+
+    for(const auto& vertex : result.path){
         std::cout << vertex << " ";
     }
 
