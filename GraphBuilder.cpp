@@ -16,25 +16,25 @@ Graph GraphBuilder::buildGraph() const{
 }
 
 void GraphBuilder::createGraph(Graph& graph) const{
-    graph.addVertex(Vertex("A"));
-    graph.addVertex(Vertex("B"));
-    graph.addVertex(Vertex("C"));
-    graph.addVertex(Vertex("D"));
-    graph.addVertex(Vertex("E"));
-    graph.addVertex(Vertex("F"));
-    graph.addVertex(Vertex("G"));
-    graph.addVertex(Vertex("J"));
-    graph.addVertex(Vertex("K"));
-    graph.addVertex(Vertex("W"));
-    graph.addVertex(Vertex("M"));
-    graph.addVertex(Vertex("O"));
-    graph.addVertex(Vertex("P"));
-    graph.addVertex(Vertex("R"));
-    graph.addVertex(Vertex("S"));
-    graph.addVertex(Vertex("Q"));
-    graph.addVertex(Vertex("T"));
-    graph.addVertex(Vertex("U"));
-    graph.addVertex(Vertex("V", VertexType::Goal));
+    graph.addVertex(Vertex("A", VertexType::Normal, 1, 4));
+    graph.addVertex(Vertex("B", VertexType::Normal, 6, 0));
+    graph.addVertex(Vertex("C", VertexType::Normal, 23, 0));
+    graph.addVertex(Vertex("D", VertexType::Normal, 39, 0));
+    graph.addVertex(Vertex("E", VertexType::Normal, 43, 4));
+    graph.addVertex(Vertex("F", VertexType::Normal, 14, 4));
+    graph.addVertex(Vertex("G", VertexType::Normal, 30, 4));
+    graph.addVertex(Vertex("J", VertexType::Normal, 10, 8));
+    graph.addVertex(Vertex("K", VertexType::Normal, 20, 8));
+    graph.addVertex(Vertex("W", VertexType::Normal, 30, 8));
+    graph.addVertex(Vertex("M", VertexType::Normal, 37, 8));
+    graph.addVertex(Vertex("O", VertexType::Normal, 0, 12));
+    graph.addVertex(Vertex("P", VertexType::Normal, 10, 12));
+    graph.addVertex(Vertex("R", VertexType::Normal, 20, 12));
+    graph.addVertex(Vertex("S", VertexType::Normal, 37, 12));
+    graph.addVertex(Vertex("Q", VertexType::Normal, 5, 16));
+    graph.addVertex(Vertex("T", VertexType::Normal, 20, 16));
+    graph.addVertex(Vertex("U", VertexType::Normal, 37, 16));
+    graph.addVertex(Vertex("V", VertexType::Goal, 20, 21));
 
     graph.addEdge(Edge("A", "B", 3));
     graph.addEdge(Edge("A", "F", 6));

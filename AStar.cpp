@@ -4,9 +4,19 @@
 #include <algorithm>
 #include <limits>
 #include <unordered_map>
+#include <cmath>
 
-int AStar::heuristic(const std::string& current, const std::string& goal){
-    return 0;
+int AStar::heuristic(const Graph& graph, const std::string& current, const std::string& goal){
+    const Vertex* currentVertex = graph.findVertex(current);
+    const Vertex* goalVertex = graph.findVertex(goal);
+
+    if (currentVertex == nullptr || goalVertex == nullptr)
+        return 0;
+
+    int dx = currentVertex->getX() - goalVertex->getX();
+    int dy = currentVertex->getY() - goalVertex->getY();
+
+    return static_cast<int>(std::sqrt(dx * dx + dy * dy));
 }
 
 PathResult AStar::findShortestPath( const Graph& graph, const std::string& start, const std::string& goal){
@@ -32,7 +42,7 @@ PathResult AStar::findShortestPath( const Graph& graph, const std::string& start
 
     gScore[start] = 0;
 
-    heap.insert(start,heuristic(start, goal));
+    heap.insert(start, heuristic(graph, start, goal));
 
     while (!heap.empty()){
         std::string current = heap.extractMin();
@@ -61,7 +71,7 @@ PathResult AStar::findShortestPath( const Graph& graph, const std::string& start
 
                 parent[neighbor.vertexName] = current;
 
-                int priority = tentativeG + heuristic( neighbor.vertexName, goal);
+                int priority = tentativeG + heuristic(graph, neighbor.vertexName, goal);
 
                 if (heap.contains(neighbor.vertexName)){
                     heap.decreaseKey( neighbor.vertexName, priority );

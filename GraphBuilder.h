@@ -3,8 +3,7 @@
 
 #include "Graph.h"
 
-class GraphBuilder
-{
+class GraphBuilder{
 private:
 
     void createGraph(Graph& graph) const;

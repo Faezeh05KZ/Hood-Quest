@@ -13,8 +13,7 @@ public:
     static PathResult findShortestPath( const Graph& graph, const std::string& start, const std::string& goal );
     
 private:
-
-    static int heuristic( const std::string& current, const std::string& goal );
+    static int heuristic(const Graph& graph, const std::string& current, const std::string& goal );
 };
 
 #endif

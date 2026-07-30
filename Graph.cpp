@@ -127,6 +127,16 @@ Vertex* Graph::findVertex(const std::string& vertexName){
     return nullptr;
 }
 
+const Vertex* Graph::findVertex(const std::string& vertexName) const{
+    for (const Vertex& vertex : vertices){
+        if (vertex.getId() == vertexName){
+            return &vertex;
+        }
+    }
+
+    return nullptr;
+}
+
 bool Graph::hasVertex(const std::string& vertexName) const{
     for (const Vertex& vertex : vertices){
         if (vertex.getId() == vertexName){
