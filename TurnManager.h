@@ -7,26 +7,27 @@
 #include "Renderer.h"
 #include "InputManager.h"
 #include "MoveManager.h"
-#include "UndoManager.hpp"
+#include "UndoManager.h"
+#include "Dijkstra.h"
+#include "Constant.h"
 #include <string>
 #include <vector>
 
-class TurnManager
-{
+class TurnManager {
 public:
-    TurnManager(GameState &state, MoveManager &moveManager, UndoManager &undoManager, const std::string &username);
+    TurnManager(GameState& state, MoveManager& moveManager, UndoManager& undoManager, const std::string& username);
 
     bool executeTurn();
 
 private:
-    GameState &state;
-    MoveManager &moveManager;
-    UndoManager &undoManager;
+    GameState& state;
+    MoveManager& moveManager;
+    UndoManager& undoManager;
     std::string username;
 
     bool lastMoveWasUndo;
 
-    bool playerPhase(const std::string &suggestedNext, const std::vector<std::string> &validMoves);
+    bool playerPhase(const std::string& suggestedNext, const std::vector<std::string>& validMoves);
 
     void wolfPhase();
 

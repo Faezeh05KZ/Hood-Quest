@@ -4,7 +4,7 @@
 #include <string>
 #include "Player.h"
 #include "Wolf.h"
-#include "Graph.h" 
+#include "Graph.h"
 
 enum class GameStatus { Playing, Won, Lost };
 
@@ -19,15 +19,15 @@ private:
 
 public:
     GameState();
-    GameState(const Graph* g); 
-    GameState(const GameState &other);
+    explicit GameState(const Graph* g);
+    GameState(const GameState& other);
 
-    GameState &operator=(const GameState &other);
+    GameState& operator=(const GameState& other);
 
     void reset(const std::string& playerStart = "", const std::string& wolfStart = "");
     void nextTurn();
     bool isGameOver() const;
-    bool areColliding() const; 
+    bool areColliding() const;
 
     Player& getPlayer();
     const Player& getPlayer() const;
@@ -35,8 +35,8 @@ public:
     Wolf& getWolf();
     const Wolf& getWolf() const;
 
-    const Graph* getGraph() const; 
-    void setGraph(const Graph* g); 
+    const Graph* getGraph() const;
+    void setGraph(const Graph* g);
 
     int getScore() const;
     void setScore(int s);
@@ -48,4 +48,4 @@ public:
     void setStatus(GameStatus s);
 };
 
-#endif 
+#endif

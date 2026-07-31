@@ -3,44 +3,39 @@
 #include <iostream>
 #include <string>
 
-TurnManager::TurnManager(GameState &state, MoveManager &moveManager, UndoManager &undoManager, const std::string &username)
+TurnManager::TurnManager(GameState& state, MoveManager& moveManager, UndoManager& undoManager, const std::string& username)
     : state(state), moveManager(moveManager), undoManager(undoManager),
       username(username), lastMoveWasUndo(false) {}
 
-int TurnManager::rollDice()
-{
+int TurnManager::rollDice() {
     return (rand() % 6) + 1;
 }
 
-bool TurnManager::executeTurn()
-{
+bool TurnManager::executeTurn() {
     lastMoveWasUndo = false;
 
     Renderer::clearScreen();
     Renderer::renderGameHeader(state, username);
     Renderer::renderMap(state);
 
-    undoManager.saveState(state);
-
     std::string playerPos = state.getPlayer().getPosition();
-    auto suggestedPath = moveManager.suggestedPath(playerPos);
-    std::string suggestedNext = moveManager.suggestedMove(playerPos);
-    auto validMoves = moveManager.validMoves(playerPos);
+    PathResult suggestedPath = Dijkstra::findShortestPath(*state.getGraph(), playerPos, "V");
+    std::string suggestedNext = moveManager.getSuggestedNextMove();
+    std::vector<std::string> validMoves = moveManager.getValidMoves();
 
-    Renderer::renderTurnInfo(state, suggestedPath, suggestedNext, validMoves);
+    Renderer::renderTurnInfo(state, suggestedPath.path, suggestedNext, validMoves);
+    moveManager.showSuggestedAStarPath();
 
     bool gameOver = playerPhase(suggestedNext, validMoves);
-    if (gameOver)
+    if (gameOver) {
         return false;
+    }
 
-    if (!lastMoveWasUndo)
-    {
+    if (!lastMoveWasUndo) {
         wolfPhase();
 
-        if (GameRules::checkGameOver(state))
-        {
-            if (GameRules::checkLose(state))
-            {
+        if (GameRules::checkGameOver(state)) {
+            if (GameRules::checkLose(state)) {
                 state.setStatus(GameStatus::Lost);
             }
             return false;
@@ -51,10 +46,8 @@ bool TurnManager::executeTurn()
     return true;
 }
 
-bool TurnManager::playerPhase(const std::string &suggestedNext, const std::vector<std::string> &validMoves)
-{
-    while (true)
-    {
+bool TurnManager::playerPhase(const std::string& suggestedNext, const std::vector<std::string>& validMoves) {
+    while (true) {
         Renderer::renderMoveOptions(validMoves, suggestedNext, undoManager.canUndo());
 
         std::string input;
@@ -64,24 +57,16 @@ bool TurnManager::playerPhase(const std::string &suggestedNext, const std::vecto
         std::string choice = InputManager::parseMoveInput(
             input, validMoves, suggestedNext, undoManager.canUndo(), valid);
 
-        if (!valid)
-        {
-            Renderer::renderError("Invalid move! Enter a valid adjacent vertex, 'D' for suggestion, or 'U' to undo.");
+        if (!valid) {
+            Renderer::renderError("Invalid move! Enter a valid adjacent vertex, 'GO' for the suggested move, or 'UNDO' to undo.");
             continue;
         }
 
-        if (choice == "U" || choice == "u")
-        {
-            if (!undoManager.canUndo())
-            {
-                Renderer::renderError("Nothing to undo.");
-                continue;
-            }
+        if (choice == "UNDO") {
 
             state = undoManager.undo();
-
             ScoreManager::applyUndoPenalty(state);
-            Renderer::renderScoreDelta(-2, "Undo penalty");
+            Renderer::renderScoreDelta(ScoreManager::SUndo, "Undo penalty");
 
             lastMoveWasUndo = true;
             return false;
@@ -89,22 +74,26 @@ bool TurnManager::playerPhase(const std::string &suggestedNext, const std::vecto
 
         bool followedSuggestion = (choice == suggestedNext);
 
-        state.getPlayer().setPosition(choice);
+        undoManager.saveState(state);
+
+        if (!moveManager.movePlayer(choice)) {
+
+            Renderer::renderError("Move could not be applied.");
+            continue;
+        }
         ScoreManager::awardMoveScore(state, followedSuggestion);
         Renderer::renderScoreDelta(
             followedSuggestion ? ScoreManager::SFollowDijkstra : ScoreManager::SValidMove,
             followedSuggestion ? "Followed Dijkstra" : "Custom move");
 
-        if (GameRules::checkWin(state))
-        {
+        if (GameRules::checkWin(state)) {
             ScoreManager::awardWinBonus(state);
             Renderer::renderScoreDelta(ScoreManager::SWin, "Reached Grandma's house!");
             state.setStatus(GameStatus::Won);
             return true;
         }
 
-        if (GameRules::checkLose(state))
-        {
+        if (GameRules::checkLose(state)) {
             state.setStatus(GameStatus::Lost);
             return true;
         }
@@ -113,27 +102,17 @@ bool TurnManager::playerPhase(const std::string &suggestedNext, const std::vecto
     }
 }
 
-void TurnManager::wolfPhase()
-{
+void TurnManager::wolfPhase() {
     std::string wolfPos = state.getWolf().getPosition();
-    std::string playerPos = state.getPlayer().getPosition();
 
     int dice = rollDice();
     bool wolfCanMove = (dice % 2 == 0);
-
-    std::string wolfDest = wolfPos;
     bool actuallyMoved = false;
 
-    if (wolfCanMove)
-    {
-        std::string next = moveManager.wolfNextMove(wolfPos, playerPos);
-        if (!next.empty() && next != wolfPos)
-        {
-            state.getWolf().setPosition(next);
-            wolfDest = next;
-            actuallyMoved = true;
-        }
+    if (wolfCanMove) {
+        moveManager.moveWolf();
+        actuallyMoved = (state.getWolf().getPosition() != wolfPos);
     }
 
-    Renderer::renderWolfMove(wolfPos, wolfDest, actuallyMoved, dice);
+    Renderer::renderWolfMove(wolfPos, state.getWolf().getPosition(), actuallyMoved, dice);
 }

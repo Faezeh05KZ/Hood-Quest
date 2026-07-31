@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "GraphPrinter.h"
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
@@ -123,9 +124,9 @@ void Renderer::renderMoveOptions(const std::vector<std::string> &validMoves, con
             std::cout << ", ";
     }
     std::cout << "\n";
-    std::cout << "  " << Color::CYAN << "[D]" << Color::RESET << " Follow Dijkstra's suggestion";
+    std::cout << "  " << Color::CYAN << "[GO]" << Color::RESET << " Follow Dijkstra's suggestion";
     if (canUndo)
-        std::cout << "  |  " << Color::YELLOW << "[U]" << Color::RESET << " Undo";
+        std::cout << "  |  " << Color::YELLOW << "[UNDO]" << Color::RESET << " Undo";
     std::cout << "\n";
     std::cout << "  > ";
 }
@@ -179,43 +180,20 @@ void Renderer::renderMap(const GameState &state)
     if (!g)
         return;
 
+    // Print the visual ASCII graph map
+    GraphPrinter printer;
+    printer.printGraph(*g);
+
+    // Show current positions below the map
     std::string player = state.getPlayer().getPosition();
     std::string wolf = state.getWolf().getPosition();
 
-    std::cout << "\n  Map nodes ("
-              << Color::RED << " [R]" << Color::RESET << "=Red Hood "
-              << Color::YELLOW << " [W]" << Color::RESET << "=Wolf "
-              << Color::GREEN << " [G]" << Color::RESET << "=Grandma )\n  ";
-
-    for (const auto &v : g->getVertices())
-    {
-        std::string id = v.getId();
-        std::cout << id;
-        if (id == player && id == wolf)
-            std::cout << Color::MAGENTA << "[R+W] " << Color::RESET;
-        else if (id == player)
-            std::cout << Color::RED << "[R]   " << Color::RESET;
-        else if (id == wolf)
-            std::cout << Color::YELLOW << "[W]   " << Color::RESET;
-        else if (id == "V")
-            std::cout << Color::GREEN << "[G]   " << Color::RESET;
-        else
-            std::cout << "      ";
-    }
-    std::cout << "\n\n";
-
-    std::cout << "  Edges:\n   ";
-    int edgeCount = 0;
-    for (const auto &edge : g->getEdges())
-    {
-        std::cout << edge.getSource() << "-" << edge.getDestination() << "(" << edge.getWeight() << ")  ";
-        edgeCount++;
-        if (edgeCount % 5 == 0)
-        {
-            std::cout << "\n   ";
-        }
-    }
-    std::cout << "\n";
+    std::cout << "  " << Color::RED << "[R]" << Color::RESET << "=Red Hood  "
+              << Color::YELLOW << "[W]" << Color::RESET << "=Wolf  "
+              << Color::GREEN << "[G]" << Color::RESET << "=Grandma(V)\n";
+    std::cout << "  Red Hood: " << Color::RED << player << Color::RESET
+              << "  |  Wolf: " << Color::YELLOW << wolf << Color::RESET
+              << "  |  Goal: " << Color::GREEN << "V" << Color::RESET << "\n\n";
 }
 
 void Renderer::renderGameOver(const GameState &state, const std::string &username)

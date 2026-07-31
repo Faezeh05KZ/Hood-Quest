@@ -3,20 +3,18 @@
 GameState::GameState()
     : player(), wolf(), graph(nullptr), score(0), turnNumber(1), status(GameStatus::Playing) {}
 
-GameState::GameState(const Graph *g)
+GameState::GameState(const Graph* g)
     : player(), wolf(), graph(g), score(0), turnNumber(1), status(GameStatus::Playing) {}
 
-GameState::GameState(const GameState &other)
+GameState::GameState(const GameState& other)
     : player(other.player), wolf(other.wolf), graph(other.graph),
       score(other.score), turnNumber(other.turnNumber), status(other.status) {}
 
-GameState &GameState::operator=(const GameState &other)
-{
-    if (this != &other)
-    {
+GameState& GameState::operator=(const GameState& other) {
+    if (this != &other) {
         player = other.player;
         wolf = other.wolf;
-        graph = other.graph; 
+        graph = other.graph;
         score = other.score;
         turnNumber = other.turnNumber;
         status = other.status;
@@ -24,14 +22,14 @@ GameState &GameState::operator=(const GameState &other)
     return *this;
 }
 
-Player &GameState::getPlayer() { return player; }
-const Player &GameState::getPlayer() const { return player; }
+Player& GameState::getPlayer() { return player; }
+const Player& GameState::getPlayer() const { return player; }
 
-Wolf &GameState::getWolf() { return wolf; }
-const Wolf &GameState::getWolf() const { return wolf; }
+Wolf& GameState::getWolf() { return wolf; }
+const Wolf& GameState::getWolf() const { return wolf; }
 
-const Graph *GameState::getGraph() const { return graph; }
-void GameState::setGraph(const Graph *g) { graph = g; }
+const Graph* GameState::getGraph() const { return graph; }
+void GameState::setGraph(const Graph* g) { graph = g; }
 
 int GameState::getScore() const { return score; }
 void GameState::setScore(int s) { score = s; }
@@ -48,10 +46,9 @@ bool GameState::areColliding() const {
     return player.getPosition() == wolf.getPosition();
 }
 
-void GameState::reset(const std::string& playerStart, const std::string& wolfStart)
-{
-    player.reset(playerStart); 
-    wolf.reset(wolfStart);  
+void GameState::reset(const std::string& playerStart, const std::string& wolfStart) {
+    player.reset(playerStart);
+    wolf.reset(wolfStart);
     score = 0;
     turnNumber = 1;
     status = GameStatus::Playing;
