@@ -26,7 +26,7 @@ Everything was implemented entirely from scratch. No cheating with `std::stack` 
 - **BST (Binary Search Tree)** — Used for searching scores by username.
 
 ## Project Structure
-```text
+
 HoodQuest/
 ├── Graph/     → Map and routing logic (Graph, Vertex, Edge, BFS, Dijkstra, AStar, etc.)
 ├── User/      → User management, auth, and scoring (HashTable, Stack, Heap, BST, etc.)
@@ -36,7 +36,7 @@ HoodQuest/
 ## How to Run?
 
 **Prerequisites:** You need a C++ compiler that supports C++17, and CMake.
-
+```text
 bash
 git clone <your-repository-url>
 cd HoodQuest
@@ -44,11 +44,12 @@ mkdir build && cd build
 cmake ..
 make
 ./HoodQuest
-
+```
 If you don't have CMake installed and just want a quick test run, this one-liner works too:
-
+```text
 bash
 g++ -std=c++17 *.cpp -o HoodQuest && ./HoodQuest
+```
 
 ## Team Members
 
