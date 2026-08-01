@@ -37,7 +37,7 @@ HoodQuest/
 
 **Prerequisites:** You need a C++ compiler that supports C++17, and CMake.
 ```text
-bash
+
 git clone <your-repository-url>
 cd HoodQuest
 mkdir build && cd build
@@ -47,7 +47,7 @@ make
 ```
 If you don't have CMake installed and just want a quick test run, this one-liner works too:
 ```text
-bash
+
 g++ -std=c++17 *.cpp -o HoodQuest && ./HoodQuest
 ```
 
