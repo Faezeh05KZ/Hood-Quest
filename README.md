@@ -14,7 +14,7 @@ The game also features a complete user system: registration, login, and securely
 
 ## Data Structures & Algorithms Used
 
-Everything was implemented entirely from scratch. No cheating with `std::stack` or `std::priority_queue`!
+Everything was implemented entirely from scratch, with `std::stack` or `std::priority_queue`!
 
 - **Graph** (Adjacency List) — The game map.
 - **Dijkstra** — Provides the suggested shortest path each turn.
@@ -38,8 +38,8 @@ HoodQuest/
 **Prerequisites:** You need a C++ compiler that supports C++17, and CMake.
 ```text
 
-git clone <your-repository-url>
-cd HoodQuest
+git clone https://github.com/Faezeh05KZ/Hood-Quest
+cd Hood-Quest
 mkdir build && cd build
 cmake ..
 make
