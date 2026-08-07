@@ -44,3 +44,5 @@ add_executable(HoodQuest
     src/Heap.cpp
     src/Stack.cpp
 )
+
+target_include_directories(HoodQuest PRIVATE include)
