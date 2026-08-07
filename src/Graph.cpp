@@ -117,16 +117,6 @@ bool Graph::removeEdge(const std::string& source, const std::string& destination
     return true;
 }
 
-Vertex* Graph::findVertex(const std::string& vertexName){
-    for (Vertex& vertex : vertices){
-        if (vertex.getId() == vertexName){
-            return &vertex;
-        }
-    }
-
-    return nullptr;
-}
-
 const Vertex* Graph::findVertex(const std::string& vertexName) const{
     for (const Vertex& vertex : vertices){
         if (vertex.getId() == vertexName){
